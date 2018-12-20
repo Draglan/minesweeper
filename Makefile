@@ -1,8 +1,16 @@
+ifeq ($(OS),Windows_NT)
+	INCLUDE:=-IC:\MinGW\include\SDL2
+	LIBS:=-LC:\MinGW\lib -lmingw32
+else
+	INCLUDE:=-I/usr/local/include/SDL2
+	LIBS:=-L/usr/local/lib
+endif
+
 CC=g++
 
-CCFLAGS=-Wall -Wpedantic -Weffc++ -std=gnu++17 -g -pg -O0 -IC:\MinGW\include\SDL2
+CCFLAGS=-Wall -Wpedantic -Weffc++ -std=gnu++17 -g -pg -O0 $(INCLUDE)
 
-LDFLAGS=-LC:\MinGW\lib -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lm
+LDFLAGS=$(LIBS) -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_mixer -lm
 
 FILES=$(patsubst %.cpp,%.o,$(wildcard *.cpp))
 

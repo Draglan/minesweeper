@@ -55,7 +55,7 @@ void Game::Run() {
   float fpsRunningAvg[avgSize] = {0.0f};
   int i = 0;
 
-  const float maxFrameRate = 30.0f;
+  const float maxFrameRate = 60.0f;
 
   while (!done_) {
     ticks = SDL_GetTicks() - timestamp;
@@ -74,7 +74,7 @@ void Game::Run() {
       SDL_Delay(1.0f / maxFrameRate * 1000.0f);
     }
 
-    if (SDL_PollEvent(&ev)) {
+    while (SDL_PollEvent(&ev)) {
       if (ev.type == SDL_QUIT) {
         done_ = true;
         break;
