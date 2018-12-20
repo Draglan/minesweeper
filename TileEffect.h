@@ -14,9 +14,9 @@ public:
   TileEffect(Uint32 delay, Texture& t, const Rectangle& src, int x, int y);
   virtual ~TileEffect(){}
 
-  virtual void HandleInput(const SDL_Event& ev, Board& board) override {}
-  virtual void Update(Uint32 ticks, Board& board) override;
-  virtual void Draw(const Window& window, const Board& board) const override;
+  virtual void HandleInput(const SDL_Event& ev) override {}
+  virtual void Update(Uint32 ticks) override;
+  virtual void Draw(const Window& window) const override;
 
 
 private:

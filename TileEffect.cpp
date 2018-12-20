@@ -11,15 +11,13 @@ TileEffect::TileEffect(Uint32 delay, Texture& t, const Rectangle& src,
 {
 }
 
-void TileEffect::Update(Uint32 ticks, Board& board) {
+void TileEffect::Update(Uint32 ticks) {
   curTime_ += ticks;
   if (curTime_ >= delay_) {
     currentAlpha_ -= alphaPerSec_ * ticks * 0.001f;
 
     if (currentAlpha_ < 0.0f) {
       currentAlpha_ = 0.0f;
-      //if (!ShouldDelete())
-        //std::cout << "Deleting after " << curTime_ << '\n';
       Delete();
     }
 
@@ -27,9 +25,8 @@ void TileEffect::Update(Uint32 ticks, Board& board) {
   }
 }
 
-void TileEffect::Draw(const Window& window, const Board& board) const {
+void TileEffect::Draw(const Window& window) const {
   Rectangle dst(x_, y_, textureSrc_.w, textureSrc_.h);
   window.Draw(texture_, &textureSrc_, &dst, color_.r, color_.g, color_.b,
     color_.a);
-  //window.DrawFilledRect(&dst, {255,255,255,color_.a/2});
 }

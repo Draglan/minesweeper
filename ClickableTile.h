@@ -4,24 +4,29 @@
 #include <SDL.h>
 #include "Drawable.h"
 
+class MinesweeperState;
 class Board;
 class Texture;
 class Window;
 
 class ClickableTile : public Drawable {
 public:
-  ClickableTile(int x, int y, unsigned width, unsigned height,
+  ClickableTile(MinesweeperState& s, Board& board,
+		int x, int y, unsigned width, unsigned height,
     unsigned boardX, unsigned boardY);
 
-  virtual void HandleInput(const SDL_Event& ev, Board& board) override;
-  virtual void Update(Uint32 ticks, Board& board) override;
-  virtual void Draw(const Window& w, const Board& board) const override;
+  virtual void HandleInput(const SDL_Event& ev) override;
+  virtual void Update(Uint32 ticks) override;
+  virtual void Draw(const Window& w) const override;
 
 private:
-	void OnLeftClick(const SDL_Event& ev, Board& board);
-	void OnRightClick(const SDL_Event& ev, Board& board);
-	void OnMouseEnter(const SDL_Event& ev, Board& board);
-	void OnMouseLeave(const SDL_Event& ev, Board& board);
+	void OnLeftClick(const SDL_Event& ev);
+	void OnRightClick(const SDL_Event& ev);
+	void OnMouseEnter(const SDL_Event& ev);
+	void OnMouseLeave(const SDL_Event& ev);
+
+	MinesweeperState& state_;
+	Board& board_;
 
   int x_, y_;
   unsigned width_, height_, boardX_, boardY_;

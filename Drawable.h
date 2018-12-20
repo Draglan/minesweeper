@@ -10,9 +10,10 @@ class Drawable {
 public:
   virtual ~Drawable() {}
 
-  virtual void HandleInput(const SDL_Event& ev, Board& board) = 0;
-  virtual void Update(Uint32 ticks, Board& board) = 0;
-  virtual void Draw(const Window& w, const Board& board) const = 0;
+  virtual void HandleInput(const SDL_Event& ev) = 0;
+  virtual void Update(Uint32 ticks) = 0;
+  virtual void Draw(const Window& w) const = 0;
+
   bool ShouldDelete() const {return shouldDelete_;}
   void Delete() {shouldDelete_ = true;}
 

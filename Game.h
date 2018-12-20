@@ -5,7 +5,7 @@
 #include "TextureFactory.h"
 #include "ClickableTile.h"
 #include "Board.h"
-#include "Drawable.h"
+#include "IGameState.h"
 #include <vector>
 #include <memory>
 
@@ -17,18 +17,25 @@ public:
   void Run();
   void Quit() {done_ = true;}
 
+	// Push a state onto the state stack.
+	void PushState(IGameState* state) {
+		states_.emplace_back(std::unique_ptr<IGameState>(state));
+	}
+
+	// Pop the top of the state stack off.
+	void PopState();
+
+	// Get the state on the top of the stack. Returns nullptr
+	// if there are no states on the stack.
+	IGameState* GetTopState() const;
+
+	// Clear all states from the state stack.
+	void ClearStates() {states_.clear();}
+
+	// Return the game window.
+	//
   Window& GetWindow() {return window_;}
   const Window& GetWindow() const {return window_;}
-
-  int GetMineCount() const {return numMines_;}
-
-  void SpawnDrawable(Drawable* d) {
-    drawables_.emplace_back(std::unique_ptr<Drawable>(d));
-  }
-
-  void ResetGame(int w, int h, int numMines);
-
-  void SpawnClearEffects(int tileX, int tileY, Texture& tile, const Rectangle& src);
 
 private:
   Game();
@@ -40,16 +47,11 @@ private:
   void Update(Uint32 ticks);
   void Draw() const;
 
-  static const int tileW_ = 32;
-  static const int tileH_ = 32;
-
   Window window_;
   bool done_;
-  std::vector<ClickableTile> tiles_;
-  std::vector<std::unique_ptr<Drawable>> drawables_;
-  Board board_;
   float fps_;
-  int numMines_;
+
+	std::vector<std::unique_ptr<IGameState>> states_;
 };
 
 #endif /* GAME_H */
