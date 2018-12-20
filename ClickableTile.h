@@ -18,6 +18,11 @@ public:
   virtual void Draw(const Window& w, const Board& board) const override;
 
 private:
+	void OnLeftClick(const SDL_Event& ev, Board& board);
+	void OnRightClick(const SDL_Event& ev, Board& board);
+	void OnMouseEnter(const SDL_Event& ev, Board& board);
+	void OnMouseLeave(const SDL_Event& ev, Board& board);
+
   int x_, y_;
   unsigned width_, height_, boardX_, boardY_;
   Texture& texture_;

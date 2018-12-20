@@ -29,53 +29,10 @@ void ClickableTile::HandleInput(const SDL_Event& ev, Board& board) {
     fadeColor_ = {255,255,255,static_cast<Uint8>(currentAlpha_)};
 
     if (ev.button.button == SDL_BUTTON_LEFT) {
-      if (!board.IsInitialized()) {
-        // if clicking for the first time, initialize the board
-        board.Initialize(boardX_, boardY_, Game::Inst().GetMineCount());
-        Game::Inst().SpawnClearEffects(boardX_, boardY_, texture_,
-          {0, 0, 32, 32});
-
-        board.RevealFrom(boardX_, boardY_);
-      }
-      else {
-        if (!board.At(boardX_, boardY_).hasMine &&
-            board.At(boardX_, boardY_).status != Tile::REVEALED)
-        {
-          Game::Inst().SpawnClearEffects(boardX_, boardY_, texture_,
-            {0, 0, 32, 32});
-
-          board.RevealFrom(boardX_, boardY_);
-        }
-        else if (board.At(boardX_, boardY_).hasMine) {
-          // player hit a mine: reveal all mine tiles and lose the game
-          for (int y = 0; y < board.Height(); ++y) {
-            for (int x = 0; x < board.Width(); ++x) {
-              if (board.At(x, y).hasMine)
-                board.At(x, y).status = Tile::REVEALED;
-            }
-          }
-        }
-      }
+			OnLeftClick(ev, board);
     }
     else if (ev.button.button == SDL_BUTTON_RIGHT) {
-      // toggle flag or question mark
-      //
-      Tile::Status s = board.At(boardX_, boardY_).status;
-      switch (s) {
-        case Tile::HIDDEN:
-          board.At(boardX_, boardY_).status = Tile::MARKED;
-          break;
-
-        case Tile::MARKED:
-          board.At(boardX_, boardY_).status = Tile::QMARK;
-          break;
-
-        case Tile::QMARK:
-          board.At(boardX_, boardY_).status = Tile::HIDDEN;
-          break;
-
-        default: break; // silence warnings
-      }
+			OnRightClick(ev, board);
     }
   }
   else if (ev.type == SDL_MOUSEBUTTONUP) {
@@ -90,24 +47,17 @@ void ClickableTile::HandleInput(const SDL_Event& ev, Board& board) {
     {
       // if we're moving inside the tile, trigger fade-in
       if ((oldX < x_ || oldX >= x_ + static_cast<int>(width_) ||
-          oldY < y_ || oldY >= y_ + static_cast<int>(height_)) &&
-          board.At(boardX_, boardY_).status != Tile::REVEALED)
+          oldY < y_ || oldY >= y_ + static_cast<int>(height_)))
       {
-        doFadeInEffect_ = true;
-        if (!clickedInTile_)
-          fadeColor_ = {255,255,255,0};
-        else
-          fadeColor_ = {0,0,0,0};
-
-        currentAlpha_ = 50.0f;
+				OnMouseEnter(ev, board);
       }
     }
     else if (ev.motion.x < x_ || ev.motion.x >= x_ + static_cast<int>(width_) ||
             ev.motion.y < y_ || ev.motion.y >= y_ + static_cast<int>(height_))
     {
-      // if we're moving outside the tile, trigger fade-out
-      doFadeInEffect_ = false;
-      currentAlpha_ = fadeColor_.a;
+			// if we're moving outside the tile, trigger fade-out
+			doFadeInEffect_ = false;
+			currentAlpha_ = fadeColor_.a;
     }
   }
   else if (ev.type == SDL_MOUSEBUTTONDOWN &&
@@ -168,4 +118,69 @@ void ClickableTile::Draw(const Window& w, const Board& board) const {
     ss << board.At(boardX_, boardY_).adjacentMines;
     ScreenWriter::Inst().Write(x_ + 8, y_, ss.str(), true);
   }
+}
+
+void ClickableTile::OnLeftClick(const SDL_Event& ev, Board& board) {
+	if (!board.IsInitialized()) {
+		// if clicking for the first time, initialize the board
+		board.Initialize(boardX_, boardY_, Game::Inst().GetMineCount());
+		Game::Inst().SpawnClearEffects(boardX_, boardY_, texture_,
+			{0, 0, 32, 32});
+
+		board.RevealFrom(boardX_, boardY_);
+	}
+	else {
+		if (!board.At(boardX_, boardY_).hasMine &&
+				board.At(boardX_, boardY_).status != Tile::REVEALED)
+		{
+			Game::Inst().SpawnClearEffects(boardX_, boardY_, texture_,
+				{0, 0, 32, 32});
+
+			board.RevealFrom(boardX_, boardY_);
+		}
+		else if (board.At(boardX_, boardY_).hasMine) {
+			// player hit a mine: reveal all mine tiles and lose the game
+			for (int y = 0; y < board.Height(); ++y) {
+				for (int x = 0; x < board.Width(); ++x) {
+					if (board.At(x, y).hasMine)
+						board.At(x, y).status = Tile::REVEALED;
+				}
+			}
+		}
+	}
+}
+
+void ClickableTile::OnRightClick(const SDL_Event& ev, Board& board) {
+	// toggle flag or question mark
+	//
+	Tile::Status s = board.At(boardX_, boardY_).status;
+	switch (s) {
+		case Tile::HIDDEN:
+			board.At(boardX_, boardY_).status = Tile::MARKED;
+			break;
+
+		case Tile::MARKED:
+			board.At(boardX_, boardY_).status = Tile::QMARK;
+			break;
+
+		case Tile::QMARK:
+			board.At(boardX_, boardY_).status = Tile::HIDDEN;
+			break;
+
+		default: break; // silence warnings
+	}
+}
+
+void ClickableTile::OnMouseEnter(const SDL_Event& ev, Board& board) {
+	doFadeInEffect_ = true;
+	if (!clickedInTile_)
+		fadeColor_ = {255,255,255,0};
+	else
+		fadeColor_ = {0,0,0,0};
+
+	currentAlpha_ = 50.0f;
+}
+
+void ClickableTile::OnMouseLeave(const SDL_Event& ev, Board& board) {
+
 }
