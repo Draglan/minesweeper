@@ -17,6 +17,9 @@ public:
   void Run();
   void Quit() {done_ = true;}
 
+	int DefaultWindowWidth() const {return defaultWindowW_;}
+	int DefaultWindowHeight() const {return defaultWindowH_;}
+
 	// Push a state onto the state stack.
 	void PushState(IGameState* state) {
 		states_.emplace_back(std::unique_ptr<IGameState>(state));
@@ -50,6 +53,9 @@ private:
   Window window_;
   bool done_;
   float fps_;
+
+	const int defaultWindowW_ = 320;
+	const int defaultWindowH_ = 240;
 
 	std::vector<std::unique_ptr<IGameState>> states_;
 };

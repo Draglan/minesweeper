@@ -3,14 +3,34 @@
 #include "Texture.h"
 #include <queue>
 
-MinesweeperState::MinesweeperState(int w, int h, int mineCount)
-	: tiles_(), drawables_(), board_(w, h), numMines_(mineCount)
+MinesweeperState::MinesweeperState(int w, int h, int mineCount,
+	int tilew, int tileh)
+	: tileW_(tilew), tileH_(tileh), tiles_(), drawables_(),
+	hud_(*this),
+	board_(w, h),
+	numMines_(mineCount),
+	background_(*TextureFactory::Inst().GetTexture("background2.png"))
 {
+	Game::Inst().GetWindow().SetDimensions(
+		tilew*w+tilew*3,
+		tileh*h+tileh*3
+	);
+
+	// position the board in the middle of the screen
+	int totalW = tileW_*w;
+	int totalH = tileH_*h;
+	int wndW = Game::Inst().GetWindow().Width();
+	int wndH = Game::Inst().GetWindow().Height();
+
+	bX_ = wndW / 2 - totalW / 2;
+	bY_ = wndH / 2 - totalH / 2;
+
 	// initialize the tiles
 	for (int y = 0; y < board_.Height(); ++y) {
 		for (int x = 0; x < board_.Width(); ++x) {
 			tiles_.emplace_back(
-				ClickableTile(*this, board_, x*tileW_, y*tileH_, tileW_, tileH_, x, y)
+				ClickableTile(*this, board_, x*tileW_ + bX_, y*tileH_ + bY_,
+					tileW_, tileH_, x, y)
 			);
 		}
 	}
@@ -38,9 +58,26 @@ void MinesweeperState::Update(Uint32 ticks) {
 			++it;
 		}
 	}
+
+	hud_.Update(ticks);
 }
 
 void MinesweeperState::Draw(const Window& w) const {
+	//w.ClearScreen(0, 97, 121);
+	//w.ClearScreen(150,150,150);
+	w.Draw(background_);
+
+	// draw dropshadow
+	Rectangle r(
+		bX_ + tileW_/2, bY_ + tileH_/2,
+		tileW_*board_.Width(), tileH_*board_.Height());
+
+	w.DrawFilledRect(&r, {0,0,0,100});
+
+	// draw border
+	r = {bX_-1, bY_-1, tileW_*board_.Width()+2, tileH_*board_.Height()+2};
+	w.DrawRect(&r, {0,82,81,255});
+
 	for (auto& t : tiles_) {
 		t.Draw(w);
 	}
@@ -48,22 +85,17 @@ void MinesweeperState::Draw(const Window& w) const {
 	for (auto& d : drawables_) {
 		d->Draw(w);
 	}
+
+	hud_.Draw(w);
 }
 
-void MinesweeperState::ResetGame(int w, int h, int numMines) {
-	tiles_.clear();
+void MinesweeperState::ResetGame() {
   drawables_.clear();
 
-  board_.SetDimensions(w, h);
-  numMines_ = numMines;
-
-  for (int y = 0; y < board_.Height(); ++y) {
-    for (int x = 0; x < board_.Width(); ++x) {
-      tiles_.emplace_back(
-        ClickableTile(*this, board_, x*tileW_, y*tileH_, tileW_, tileH_, x, y)
-      );
-    }
-  }
+  board_.SetDimensions(board_.Width(), board_.Height());
+	hud_.StopTimer();
+	hud_.ResetTime();
+	SetFlagsUsed(0);
 }
 
 void MinesweeperState::
@@ -109,8 +141,14 @@ SpawnClearEffects(int tileX, int tileY, Texture& tile, const Rectangle& src) {
 						visited[n[i]] = true;
 						toVisit.push(n[i]);
 
+						Rectangle dst;
+						dst.x = n[i].first*tileW_+bX_;
+						dst.y = n[i].second*tileH_+bY_;
+						dst.w = tileW_;
+						dst.h = tileH_;
+
 						SpawnDrawable(new TileEffect(curDelay, tile,
-							src, n[i].first*tileW_, n[i].second*tileH_));
+							src, dst));
 					}
 				}
 			}

@@ -4,9 +4,9 @@
 #include <iostream>
 
 TileEffect::TileEffect(Uint32 delay, Texture& t, const Rectangle& src,
-  int x, int y)
+  const Rectangle& dst)
   : delay_(delay), texture_(t), textureSrc_(src),
-  curTime_(0), x_(x), y_(y),
+  dst_(dst), curTime_(0),
   color_({255,255,255,255}), currentAlpha_(255.0f)
 {
 }
@@ -26,7 +26,8 @@ void TileEffect::Update(Uint32 ticks) {
 }
 
 void TileEffect::Draw(const Window& window) const {
-  Rectangle dst(x_, y_, textureSrc_.w, textureSrc_.h);
-  window.Draw(texture_, &textureSrc_, &dst, color_.r, color_.g, color_.b,
+  window.Draw(texture_, &textureSrc_, &dst_, color_.r, color_.g, color_.b,
     color_.a);
+
+	//window.DrawFilledRect(&dst_, {255,255,255, color_.a});
 }

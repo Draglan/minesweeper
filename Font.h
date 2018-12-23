@@ -14,6 +14,12 @@ public:
   ~Font();
 
   unsigned PtSize() const {return ptSize_;}
+	const std::string& Name() const {return name_;}
+
+	void SizeText(const std::string& text, int* w, int* h) {
+		TTF_SizeText(font_, text.c_str(), w, h);
+	}
+	void SizeText(char ch, int* w, int* h);
 
   TTF_Font* SDLFont() const {return font_;}
   operator TTF_Font*() const {return font_;}
@@ -21,6 +27,7 @@ public:
 private:
   TTF_Font* font_;
   unsigned ptSize_;
+	std::string name_;
   static unsigned fontCount_;
 };
 

@@ -8,7 +8,7 @@
 
 int main(int argc, char** argv) {
 	try {
-		Game::Inst().PushState(new MinesweeperState(10, 10, 10));
+		Game::Inst().PushState(new MinesweeperState(29, 14, 10, 32, 32));
 		Game::Inst().Run();
 	}
 	catch (std::exception& e) {

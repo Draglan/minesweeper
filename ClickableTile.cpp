@@ -6,6 +6,7 @@
 #include "ScreenWriter.h"
 #include "Game.h"
 #include "MinesweeperState.h"
+#include "WinLoseState.h"
 #include <sstream>
 #include <iostream>
 #include <cmath>
@@ -118,18 +119,38 @@ void ClickableTile::Draw(const Window& w) const {
   {
     std::stringstream ss;
     ss << board_.At(boardX_, boardY_).adjacentMines;
-    ScreenWriter::Inst().Write(x_ + 8, y_, ss.str(), true);
+
+		ScreenWriter& sw = ScreenWriter::Inst();
+
+		if (sw.GetCurrentFont() && ss.str().length() > 0) {
+			unsigned ptSize = state_.GetTileHeight()*0.75;
+			Font* f = sw.GetFont(sw.GetCurrentFont()->Name(), ptSize);
+
+			if (f) {
+				// draw the number in the center of the tile
+				int w, h;
+				f->SizeText(ss.str().at(0), &w, &h);
+				int tx = x_ + state_.GetTileWidth() / 2 - w / 2;
+				int ty = y_ + state_.GetTileHeight() / 2 - h / 2;
+
+				sw.Write(f, sw.GetColor(), tx, ty, ss.str(), true);
+			}
+		}
   }
 }
 
 void ClickableTile::OnLeftClick(const SDL_Event& ev) {
 	if (!board_.IsInitialized()) {
-		// if clicking for the first time, initialize the board_
+		// if clicking for the first time, initialize the board_and
+		// start the game timer
+		//
 		board_.Initialize(boardX_, boardY_, state_.GetMineCount());
 		state_.SpawnClearEffects(boardX_, boardY_, texture_,
 			{0, 0, 32, 32});
 
 		board_.RevealFrom(boardX_, boardY_);
+		state_.SetFlagsUsed(0);
+		state_.GetHUD().StartTimer();
 	}
 	else {
 		if (!board_.At(boardX_, boardY_).hasMine &&
@@ -148,7 +169,16 @@ void ClickableTile::OnLeftClick(const SDL_Event& ev) {
 						board_.At(x, y).status = Tile::REVEALED;
 				}
 			}
+			Game::Inst().PushState(new WinLoseState(false));
+			return;
 		}
+	}
+
+	// Check to see if we won
+	int bw = board_.Width();
+	int bh = board_.Height();
+	if (board_.RevealedTiles() == bw*bh - board_.MineCount()) {
+		Game::Inst().PushState(new WinLoseState(true));
 	}
 }
 
@@ -159,10 +189,12 @@ void ClickableTile::OnRightClick(const SDL_Event& ev) {
 	switch (s) {
 		case Tile::HIDDEN:
 			board_.At(boardX_, boardY_).status = Tile::MARKED;
+			state_.IncrementFlagsUsed();
 			break;
 
 		case Tile::MARKED:
 			board_.At(boardX_, boardY_).status = Tile::QMARK;
+			state_.DecrementFlagsUsed();
 			break;
 
 		case Tile::QMARK:

@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "ScreenWriter.h"
 #include "TileEffect.h"
+#include <limits>
 #include <cstring>
 #include <queue>
 #include <map>
@@ -38,33 +39,31 @@ void Game::Run() {
 
   // FPS variables
   //
-  const Uint32 fpsUpdateDelay = 100;
-  Uint32 fpsUpdateTime = SDL_GetTicks() + fpsUpdateDelay;
-  const int avgSize = 10;
+	const int fpsUpdateDelay = 100;
+	Uint32 fpsUpdateTimer = SDL_GetTicks() + fpsUpdateDelay;
+	const float maxFrameRate = 30.0f;
+  const int avgSize = 30;
   float fpsRunningAvg[avgSize] = {0.0f};
   int i = 0;
 
-  const float maxFrameRate = 30.0f;
-
   while (!done_) {
-    ticks = SDL_GetTicks() - timestamp;
-    timestamp = SDL_GetTicks();
+		ticks = SDL_GetTicks() - timestamp;
+		timestamp = SDL_GetTicks();
 
-    // update fps every X milliseconds
-    if (SDL_GetTicks() >= fpsUpdateTime) {
-      i = (i + 1) % avgSize;
-      fpsRunningAvg[i] = 1000.0f / ticks;
+		// keep track of past N ticks for calculating avg. fps
+		fpsRunningAvg[i] = ticks;
+		i = (i + 1) % avgSize;
 
-      fps_ = std::accumulate<float*, float>(
-				fpsRunningAvg, fpsRunningAvg + avgSize, 0.0f) / avgSize;
+		// calculate FPS occasionally
+		if (SDL_GetTicks() >= fpsUpdateTimer) {
+			float denom = std::accumulate(fpsRunningAvg,
+				fpsRunningAvg + avgSize, 0.0f) / avgSize;
 
-      fpsUpdateTime = SDL_GetTicks() + fpsUpdateDelay;
-    }
-
-    // cap framerate
-    if (ticks < 1.0f / maxFrameRate * 1000.0f) {
-      SDL_Delay(1.0f / maxFrameRate * 1000.0f);
-    }
+			if (denom != 0.0f) {
+				fps_ = 1000.0f / denom;
+			}
+			fpsUpdateTimer = SDL_GetTicks() + fpsUpdateDelay;
+		}
 
 		// handle all input queued up for this frame
     while (SDL_PollEvent(&ev)) {
@@ -83,6 +82,13 @@ void Game::Run() {
 		// update and render game states
     Update(ticks);
     Draw();
+
+		// cap framerate by sleeping off excess frame time
+		ticks = SDL_GetTicks() - timestamp;
+
+		if (ticks < 1000.0f / maxFrameRate) {
+			SDL_Delay(1000.0f / maxFrameRate - ticks);
+		}
   }
 }
 

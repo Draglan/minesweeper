@@ -19,6 +19,9 @@ public:
 	unsigned Width() const {return width_;}
 	unsigned Height() const {return height_;}
 
+	// Resize the window.
+	void SetDimensions(unsigned w, unsigned h);
+
 	// Drawing methods.
 	//
 

@@ -41,6 +41,7 @@ Window::Window(const std::string& title, unsigned w, unsigned h)
 
 	SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
 	SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
+	SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1" );
 }
 
 Window::Window(Window&& other)
@@ -70,6 +71,12 @@ Window& Window::operator=(Window&& other) {
 		other.renderer_ = nullptr;
 	}
 	return *this;
+}
+
+void Window::SetDimensions(unsigned w, unsigned h) {
+	SDL_SetWindowSize(window_, w, h);
+	width_ = w;
+	height_ = h;
 }
 
 void Window::ClearScreen(Uint8 r, Uint8 g, Uint8 b) const {

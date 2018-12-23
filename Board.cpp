@@ -5,13 +5,13 @@
 
 Board::Board()
   : width_(0), height_(0), numMines_(0),
-  board_(nullptr),isInitialized_(false)
+  board_(nullptr),isInitialized_(false),revealedTiles_(0)
 {
 }
 
 Board::Board(int width, int height)
   : width_(width), height_(height), numMines_(0),
-  board_(nullptr), isInitialized_(false)
+  board_(nullptr), isInitialized_(false), revealedTiles_(0)
 {
   board_ = std::make_unique<Tile[]>(width*height);
 }
@@ -33,11 +33,13 @@ void Board::SetDimensions(int w, int h) {
   width_ = w;
   height_ = h;
   isInitialized_ = false;
+	revealedTiles_ = 0;
 }
 
 void Board::Initialize(int startX, int startY, int numMines) {
   isInitialized_ = true;
   numMines_ = numMines;
+	revealedTiles_ = 0;
 
   // reset all of the tiles
   for (int i = 0; i < width_*height_; ++i) {
@@ -79,6 +81,7 @@ void Board::RevealFrom(int x, int y) {
     return;
 
   At(x, y).status = Tile::REVEALED;
+	++revealedTiles_;
 
   if (At(x, y).adjacentMines != 0)
     return;
