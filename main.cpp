@@ -9,6 +9,7 @@
 
 int main(int argc, char** argv) {
 	try {
+		Game::Inst();
 		Game::Inst().PushState(new MainMenuState);
 		Game::Inst().Run();
 	}

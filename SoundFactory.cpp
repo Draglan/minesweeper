@@ -31,6 +31,7 @@ Mix_Chunk* SoundFactory::GetChunk(const std::string& name) {
 		Mix_Chunk* result = Mix_LoadWAV(name.c_str());
 		if (result) {
 			chunks[name] = result;
+			Mix_VolumeChunk(result, MIX_MAX_VOLUME/2);
 		}
 		return result;
 	}

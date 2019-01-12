@@ -165,10 +165,8 @@ void ClickableTile::OnLeftClick(const SDL_Event& ev) {
 			state_.SpawnClearEffects(boardX_, boardY_, texture_,
 				{0, 0, 32, 32});
 
-			if (board_.RevealFrom(boardX_, boardY_) == 1)
-				SoundFactory::Inst().PlaySound("single.wav");
-			else
-				SoundFactory::Inst().PlaySound("clear.wav");
+			board_.RevealFrom(boardX_, boardY_);
+			SoundFactory::Inst().PlaySound("clear.wav");
 		}
 		else if (board_.At(boardX_, boardY_).hasMine) {
 			// player hit a mine: reveal all mine tiles and lose the game
@@ -189,7 +187,7 @@ void ClickableTile::OnLeftClick(const SDL_Event& ev) {
 	int bw = board_.Width();
 	int bh = board_.Height();
 	if (board_.RevealedTiles() == bw*bh - board_.MineCount()) {
-		
+
 		Game::Inst().PushState(new WinLoseState(true));
 	}
 }

@@ -111,11 +111,6 @@ void Game::Draw() const {
 	for (auto& s : states_)
 		s->Draw(window_);
 
-  // draw framerate
-  std::stringstream ss;
-  ss << std::setprecision(3) << fps_;
-  ScreenWriter::Inst().Write(0, 0, ss.str());
-
   window_.Present();
 }
 
