@@ -8,6 +8,7 @@
 #include "IGameState.h"
 #include <vector>
 #include <memory>
+#include <string>
 
 class Game {
 public:
@@ -17,8 +18,10 @@ public:
   void Run();
   void Quit() {done_ = true;}
 
-	int DefaultWindowWidth() const {return defaultWindowW_;}
-	int DefaultWindowHeight() const {return defaultWindowH_;}
+	constexpr int DefaultWindowWidth() const {return defaultWindowW_;}
+	constexpr int DefaultWindowHeight() const {return defaultWindowH_;}
+	constexpr const std::string& DefaultFontName() const {return defaultFont_;}
+	constexpr int DefaultPtSize() const {return defaultPtSize_;}
 
 	// Push a state onto the state stack.
 	void PushState(IGameState* state) {
@@ -33,7 +36,7 @@ public:
 	IGameState* GetTopState() const;
 
 	// Clear all states from the state stack.
-	void ClearStates() {states_.clear();}
+	void ClearStates();
 
 	// Return the game window.
 	//
@@ -51,13 +54,23 @@ private:
   void Draw() const;
 
   Window window_;
-  bool done_;
+  bool done_; // if true, the game will exit
   float fps_;
 
-	const int defaultWindowW_ = 320;
-	const int defaultWindowH_ = 240;
+	// Default settings
+	//
+	const int defaultWindowW_ = 640;
+	const int defaultWindowH_ = 480;
+	const std::string defaultFont_ = "arial.ttf";
+	const int defaultPtSize_ = 32;
 
 	std::vector<std::unique_ptr<IGameState>> states_;
+
+	// Holds states that have been popped off of the state stack.
+	// They are held in memory until the end of the update cycle and then
+	// destroyed (aka cleared from this vector). This is done so that states
+	// aren't erased in the middle of their own method calls.
+	std::vector<std::unique_ptr<IGameState>> tmpStates_;
 };
 
 #endif /* GAME_H */

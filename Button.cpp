@@ -2,6 +2,7 @@
 #include "ScreenWriter.h"
 #include "Rectangle.h"
 #include "Window.h"
+#include "SoundFactory.h"
 
 void Button::HandleInput(const SDL_Event& ev) {
 	if (ev.type == SDL_MOUSEMOTION) {
@@ -54,6 +55,7 @@ void Button::Draw(const Window& w) const {
 
 void Button::OnMouseEnter() {
 	isFading_ = true;
+	SoundFactory::Inst().PlaySound("click.wav");
 }
 
 void Button::OnMouseLeave() {
@@ -61,5 +63,6 @@ void Button::OnMouseLeave() {
 }
 
 void Button::OnLeftClick() {
+	SoundFactory::Inst().PlaySound("SFX_ButtonUp.ogg");
 	if (callback_) callback_();
 }

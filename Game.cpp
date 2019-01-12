@@ -16,15 +16,16 @@ Game& Game::Inst() {
 }
 
 Game::Game()
-  : window_("Minesweeper", 640, 480),
+  : window_("Minesweeper", defaultWindowW_, defaultWindowH_),
   done_(false),
   fps_(0.0f),
-	states_()
+	states_(),
+	tmpStates_()
 {
   TextureFactory::Inst().Initialize(window_);
   ScreenWriter::Inst().Initialize(window_);
 
-  ScreenWriter::Inst().SetCurrentFont("arial.ttf", 32);
+  ScreenWriter::Inst().SetCurrentFont(DefaultFontName(), DefaultPtSize());
   ScreenWriter::Inst().SetColor({0,0,0,255});
 }
 
@@ -83,6 +84,9 @@ void Game::Run() {
     Update(ticks);
     Draw();
 
+		// Destroy temporary states
+		tmpStates_.clear();
+
 		// cap framerate by sleeping off excess frame time
 		ticks = SDL_GetTicks() - timestamp;
 
@@ -116,8 +120,20 @@ void Game::Draw() const {
 }
 
 void Game::PopState() {
-	if (!states_.empty())
+	if (!states_.empty()) {
+
+		tmpStates_.emplace_back(
+			std::unique_ptr<IGameState>(std::move(states_.back()))
+		);
+
 		states_.pop_back();
+	}
+}
+
+void Game::ClearStates() {
+	while (!states_.empty()) {
+		PopState();
+	}
 }
 
 IGameState* Game::GetTopState() const {

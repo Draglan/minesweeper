@@ -4,7 +4,7 @@
 #include "IGameState.h"
 #include "Button.h"
 #include "ScreenWriter.h"
-#include "Button.h"
+#include "PopupMenu.h"
 
 class WinLoseState : public IGameState {
 public:
@@ -19,8 +19,7 @@ public:
 
 private:
 	bool win_;
-	Button playAgain_;
-	Button mainMenu_;
+	PopupMenu menu_;
 };
 
 #endif /* WIN_LOSE_STATE_H */

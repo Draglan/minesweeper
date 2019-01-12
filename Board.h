@@ -33,7 +33,7 @@ public:
   bool IsInitialized() const {return isInitialized_;}
 
   void Initialize(int startX, int startY, int numMines);
-  void RevealFrom(int x, int y);
+  int RevealFrom(int x, int y);
 
 private:
   int width_, height_, numMines_;

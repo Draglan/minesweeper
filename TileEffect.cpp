@@ -29,5 +29,7 @@ void TileEffect::Draw(const Window& window) const {
   window.Draw(texture_, &textureSrc_, &dst_, color_.r, color_.g, color_.b,
     color_.a);
 
-	//window.DrawFilledRect(&dst_, {255,255,255, color_.a});
+	const float aRatio = highlightAlpha_ / 255.0f;
+	window.DrawFilledRect(&dst_, {255,255,255,
+		static_cast<Uint8>(color_.a * aRatio)});
 }

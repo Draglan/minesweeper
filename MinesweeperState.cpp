@@ -1,4 +1,6 @@
 #include "MinesweeperState.h"
+#include "PauseMenuState.h"
+#include "MainMenuState.h"
 #include "TileEffect.h"
 #include "Texture.h"
 #include <queue>
@@ -42,6 +44,18 @@ void MinesweeperState::HandleInput(const SDL_Event& ev) {
 
 	for (auto& d : drawables_)
 		d->HandleInput(ev);
+
+	if (ev.type == SDL_KEYUP) {
+		if (ev.key.keysym.sym == SDLK_ESCAPE) {
+			// Pause menu on ESC
+			Game::Inst().PushState(new PauseMenuState);
+		}
+		else if (ev.key.keysym.sym == SDLK_F2) {
+			// Main menu on F2
+			Game::Inst().ClearStates();
+			Game::Inst().PushState(new MainMenuState);
+		}
+	}
 }
 
 void MinesweeperState::Update(Uint32 ticks) {
@@ -63,8 +77,6 @@ void MinesweeperState::Update(Uint32 ticks) {
 }
 
 void MinesweeperState::Draw(const Window& w) const {
-	//w.ClearScreen(0, 97, 121);
-	//w.ClearScreen(150,150,150);
 	w.Draw(background_);
 
 	// draw dropshadow

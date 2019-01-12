@@ -65,7 +65,6 @@ public:
 	void DrawLine(int x1, int y1, int x2, int y2, SDL_Color col) const;
 
 
-
 	SDL_Window* SDLWindow() const {return window_;}
 	operator SDL_Window*() const {return window_;}
 

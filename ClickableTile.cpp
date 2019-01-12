@@ -7,6 +7,7 @@
 #include "Game.h"
 #include "MinesweeperState.h"
 #include "WinLoseState.h"
+#include "SoundFactory.h"
 #include <sstream>
 #include <iostream>
 #include <cmath>
@@ -148,9 +149,14 @@ void ClickableTile::OnLeftClick(const SDL_Event& ev) {
 		state_.SpawnClearEffects(boardX_, boardY_, texture_,
 			{0, 0, 32, 32});
 
-		board_.RevealFrom(boardX_, boardY_);
+		if (board_.RevealFrom(boardX_, boardY_) == 1)
+			SoundFactory::Inst().PlaySound("single.wav");
+		else
+			SoundFactory::Inst().PlaySound("clear.wav");
+
 		state_.SetFlagsUsed(0);
 		state_.GetHUD().StartTimer();
+
 	}
 	else {
 		if (!board_.At(boardX_, boardY_).hasMine &&
@@ -159,10 +165,15 @@ void ClickableTile::OnLeftClick(const SDL_Event& ev) {
 			state_.SpawnClearEffects(boardX_, boardY_, texture_,
 				{0, 0, 32, 32});
 
-			board_.RevealFrom(boardX_, boardY_);
+			if (board_.RevealFrom(boardX_, boardY_) == 1)
+				SoundFactory::Inst().PlaySound("single.wav");
+			else
+				SoundFactory::Inst().PlaySound("clear.wav");
 		}
 		else if (board_.At(boardX_, boardY_).hasMine) {
 			// player hit a mine: reveal all mine tiles and lose the game
+			SoundFactory::Inst().PlaySound("lose.wav");
+
 			for (int y = 0; y < board_.Height(); ++y) {
 				for (int x = 0; x < board_.Width(); ++x) {
 					if (board_.At(x, y).hasMine)
@@ -178,6 +189,7 @@ void ClickableTile::OnLeftClick(const SDL_Event& ev) {
 	int bw = board_.Width();
 	int bh = board_.Height();
 	if (board_.RevealedTiles() == bw*bh - board_.MineCount()) {
+		
 		Game::Inst().PushState(new WinLoseState(true));
 	}
 }
@@ -185,20 +197,25 @@ void ClickableTile::OnLeftClick(const SDL_Event& ev) {
 void ClickableTile::OnRightClick(const SDL_Event& ev) {
 	// toggle flag or question mark
 	//
+
 	Tile::Status s = board_.At(boardX_, boardY_).status;
+
 	switch (s) {
 		case Tile::HIDDEN:
 			board_.At(boardX_, boardY_).status = Tile::MARKED;
 			state_.IncrementFlagsUsed();
+			SoundFactory::Inst().PlaySound("bip.wav");
 			break;
 
 		case Tile::MARKED:
 			board_.At(boardX_, boardY_).status = Tile::QMARK;
 			state_.DecrementFlagsUsed();
+			SoundFactory::Inst().PlaySound("bip.wav");
 			break;
 
 		case Tile::QMARK:
 			board_.At(boardX_, boardY_).status = Tile::HIDDEN;
+			SoundFactory::Inst().PlaySound("bip.wav");
 			break;
 
 		default: break; // silence warnings
@@ -206,6 +223,9 @@ void ClickableTile::OnRightClick(const SDL_Event& ev) {
 }
 
 void ClickableTile::OnMouseEnter(const SDL_Event& ev) {
+	if (board_.At(boardX_, boardY_).status != Tile::REVEALED)
+		SoundFactory::Inst().PlaySound("SFX_ButtonHover.ogg");
+
 	doFadeInEffect_ = true;
 	if (!clickedInTile_)
 		fadeColor_ = {255,255,255,0};

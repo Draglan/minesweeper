@@ -27,6 +27,8 @@ public:
 	int Width() const {return w_;}
 	int Height() const {return h_;}
 
+	const std::string& Text() const {return text_;}
+
 	virtual void HandleInput(const SDL_Event& ev) override;
 	virtual void Update(Uint32 ticks) override;
 	virtual void Draw(const Window& w) const override;

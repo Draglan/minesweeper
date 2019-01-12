@@ -27,8 +27,10 @@ void HUD::Update(Uint32 ticks) {
 }
 
 void HUD::Draw(const Window& w) const {
+	const std::string& font = Game::Inst().DefaultFontName();
+	const int ptSize = Game::Inst().DefaultPtSize();
 
-	Font* f = ScreenWriter::Inst().GetFont("arial.ttf", 32);
+	Font* f = ScreenWriter::Inst().GetFont(font, ptSize);
 	if (!f) return;
 
 	// Draw bar across top of screen

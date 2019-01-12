@@ -5,10 +5,11 @@
 #include "Game.h"
 #include "Board.h"
 #include "MinesweeperState.h"
+#include "MainMenuState.h"
 
 int main(int argc, char** argv) {
 	try {
-		Game::Inst().PushState(new MinesweeperState(29, 14, 10, 32, 32));
+		Game::Inst().PushState(new MainMenuState);
 		Game::Inst().Run();
 	}
 	catch (std::exception& e) {

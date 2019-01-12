@@ -28,6 +28,7 @@ private:
   SDL_Color color_;
   float currentAlpha_;
   const float alphaPerSec_ = 700.0f;
+	const float highlightAlpha_ = 150.0f;
 };
 
 #endif /* TILE_EFFECT_H */
