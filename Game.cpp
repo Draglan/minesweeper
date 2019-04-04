@@ -10,6 +10,8 @@
 #include <numeric>
 #include <iomanip>
 
+const std::string Game::defaultFont_ = "arial.ttf";
+
 Game& Game::Inst() {
   static Game instance;
   return instance;

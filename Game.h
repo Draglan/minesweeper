@@ -18,10 +18,10 @@ public:
   void Run();
   void Quit() {done_ = true;}
 
-	constexpr int DefaultWindowWidth() const {return defaultWindowW_;}
-	constexpr int DefaultWindowHeight() const {return defaultWindowH_;}
-	constexpr const std::string& DefaultFontName() const {return defaultFont_;}
-	constexpr int DefaultPtSize() const {return defaultPtSize_;}
+	int DefaultWindowWidth() const {return defaultWindowW_;}
+	int DefaultWindowHeight() const {return defaultWindowH_;}
+	const std::string& DefaultFontName() const {return defaultFont_;}
+	int DefaultPtSize() const {return defaultPtSize_;}
 
 	// Push a state onto the state stack.
 	void PushState(IGameState* state) {
@@ -59,10 +59,10 @@ private:
 
 	// Default settings
 	//
-	const int defaultWindowW_ = 640;
-	const int defaultWindowH_ = 480;
-	const std::string defaultFont_ = "arial.ttf";
-	const int defaultPtSize_ = 32;
+	static const int defaultWindowW_ = 640;
+	static const int defaultWindowH_ = 480;
+	static const std::string defaultFont_;
+	static const int defaultPtSize_ = 32;
 
 	std::vector<std::unique_ptr<IGameState>> states_;
 
