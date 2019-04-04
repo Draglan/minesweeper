@@ -27,16 +27,19 @@ public:
   int Width() const {return width_;}
   int Height() const {return height_;}
   int MineCount() const {return numMines_;}
+	int RevealedTiles() const {return revealedTiles_;}
+
   void SetDimensions(int w, int h);
   bool IsInitialized() const {return isInitialized_;}
 
   void Initialize(int startX, int startY, int numMines);
-  void RevealFrom(int x, int y);
+  int RevealFrom(int x, int y);
 
 private:
   int width_, height_, numMines_;
   std::unique_ptr<Tile[]> board_;
   bool isInitialized_;
+	int revealedTiles_;
 };
 
 #endif /* MINESWEEPER_BOARD_H */

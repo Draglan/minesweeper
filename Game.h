@@ -5,9 +5,10 @@
 #include "TextureFactory.h"
 #include "ClickableTile.h"
 #include "Board.h"
-#include "Drawable.h"
+#include "IGameState.h"
 #include <vector>
 #include <memory>
+#include <string>
 
 class Game {
 public:
@@ -17,18 +18,30 @@ public:
   void Run();
   void Quit() {done_ = true;}
 
+	int DefaultWindowWidth() const {return defaultWindowW_;}
+	int DefaultWindowHeight() const {return defaultWindowH_;}
+	const std::string& DefaultFontName() const {return defaultFont_;}
+	int DefaultPtSize() const {return defaultPtSize_;}
+
+	// Push a state onto the state stack.
+	void PushState(IGameState* state) {
+		states_.emplace_back(std::unique_ptr<IGameState>(state));
+	}
+
+	// Pop the top of the state stack off.
+	void PopState();
+
+	// Get the state on the top of the stack. Returns nullptr
+	// if there are no states on the stack.
+	IGameState* GetTopState() const;
+
+	// Clear all states from the state stack.
+	void ClearStates();
+
+	// Return the game window.
+	//
   Window& GetWindow() {return window_;}
   const Window& GetWindow() const {return window_;}
-
-  int GetMineCount() const {return numMines_;}
-
-  void SpawnDrawable(Drawable* d) {
-    drawables_.emplace_back(std::unique_ptr<Drawable>(d));
-  }
-
-  void ResetGame(int w, int h, int numMines);
-
-  void SpawnClearEffects(int tileX, int tileY, Texture& tile, const Rectangle& src);
 
 private:
   Game();
@@ -40,16 +53,24 @@ private:
   void Update(Uint32 ticks);
   void Draw() const;
 
-  static const int tileW_ = 32;
-  static const int tileH_ = 32;
-
   Window window_;
-  bool done_;
-  std::vector<ClickableTile> tiles_;
-  std::vector<std::unique_ptr<Drawable>> drawables_;
-  Board board_;
+  bool done_; // if true, the game will exit
   float fps_;
-  int numMines_;
+
+	// Default settings
+	//
+	static const int defaultWindowW_ = 640;
+	static const int defaultWindowH_ = 480;
+	static const std::string defaultFont_;
+	static const int defaultPtSize_ = 32;
+
+	std::vector<std::unique_ptr<IGameState>> states_;
+
+	// Holds states that have been popped off of the state stack.
+	// They are held in memory until the end of the update cycle and then
+	// destroyed (aka cleared from this vector). This is done so that states
+	// aren't erased in the middle of their own method calls.
+	std::vector<std::unique_ptr<IGameState>> tmpStates_;
 };
 
 #endif /* GAME_H */

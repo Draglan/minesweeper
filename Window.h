@@ -19,6 +19,9 @@ public:
 	unsigned Width() const {return width_;}
 	unsigned Height() const {return height_;}
 
+	// Resize the window.
+	void SetDimensions(unsigned w, unsigned h);
+
 	// Drawing methods.
 	//
 
@@ -60,7 +63,6 @@ public:
 	void DrawRect(const Rectangle* rect, SDL_Color col) const;
 	void DrawPoint(int x, int y, SDL_Color col) const;
 	void DrawLine(int x1, int y1, int x2, int y2, SDL_Color col) const;
-
 
 
 	SDL_Window* SDLWindow() const {return window_;}

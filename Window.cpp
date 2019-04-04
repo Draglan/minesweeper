@@ -1,5 +1,6 @@
 #include "Window.h"
 #include "SDL_image.h"
+#include <SDL_mixer.h>
 #include <SDL_ttf.h>
 #include <stdexcept>
 
@@ -39,8 +40,27 @@ Window::Window(const std::string& title, unsigned w, unsigned h)
 		throw std::runtime_error("Window::Window(): " + std::string(IMG_GetError()));
 	}
 
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1) {
+		SDL_DestroyWindow(window_);
+		SDL_DestroyRenderer(renderer_);
+		SDL_Quit();
+		IMG_Quit();
+		throw std::runtime_error("Window::Window(): " + std::string(IMG_GetError()));
+	}
+
+	flags = MIX_INIT_MP3 | MIX_INIT_OGG;
+	if (Mix_Init(flags) != flags) {
+		SDL_DestroyWindow(window_);
+		SDL_DestroyRenderer(renderer_);
+		SDL_Quit();
+		IMG_Quit();
+		Mix_CloseAudio();
+		throw std::runtime_error("Window::Window(): " + std::string(Mix_GetError()));
+	}
+
 	SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
 	SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
+	SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1" );
 }
 
 Window::Window(Window&& other)
@@ -52,6 +72,8 @@ Window::Window(Window&& other)
 }
 
 Window::~Window() {
+	Mix_CloseAudio();
+	Mix_Quit();
 	IMG_Quit();
 	SDL_DestroyRenderer(renderer_);
 	SDL_DestroyWindow(window_);
@@ -70,6 +92,12 @@ Window& Window::operator=(Window&& other) {
 		other.renderer_ = nullptr;
 	}
 	return *this;
+}
+
+void Window::SetDimensions(unsigned w, unsigned h) {
+	SDL_SetWindowSize(window_, w, h);
+	width_ = w;
+	height_ = h;
 }
 
 void Window::ClearScreen(Uint8 r, Uint8 g, Uint8 b) const {

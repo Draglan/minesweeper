@@ -4,9 +4,13 @@
 #include <cstring>
 #include "Game.h"
 #include "Board.h"
+#include "MinesweeperState.h"
+#include "MainMenuState.h"
 
 int main(int argc, char** argv) {
 	try {
+		Game::Inst();
+		Game::Inst().PushState(new MainMenuState);
 		Game::Inst().Run();
 	}
 	catch (std::exception& e) {
