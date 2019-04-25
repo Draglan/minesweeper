@@ -113,6 +113,16 @@ void Game::Draw() const {
 	for (auto& s : states_)
 		s->Draw(window_);
 
+	// draw FPS to screen in top left
+	std::stringstream ss;
+	ss << "FPS: " << fps_;
+	
+	Font* f = ScreenWriter::Inst().GetFont("arial.ttf", 14);
+	
+	if (f){
+		ScreenWriter::Inst().Write(f, {255,255,255,255}, 0, 0, ss.str(), false);
+	}
+	
   window_.Present();
 }
 

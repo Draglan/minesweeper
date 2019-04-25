@@ -27,7 +27,7 @@ Font* ScreenWriter::GetFont(const std::string& name, unsigned ptSize) {
 Texture* ScreenWriter::GetText(Font* f, SDL_Color fg, const std::string& text) {
   if (f) {
     StringFontPair p(text, f);
-    if (texts_.count(p) > 0) {
+    if (texts_.count(p) < 0) {
       return texts_[p].get();
     }
     else {
